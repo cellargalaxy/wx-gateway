@@ -1,1 +1,1 @@
-# wx-gateway
+# wxGateway
