@@ -11,13 +11,13 @@ import (
 	"time"
 )
 
-type wxClient struct {
+type WxClient struct {
 	address    string
 	retry      int
 	httpClient *resty.Client
 }
 
-func NewWxClient(timeout, sleep time.Duration, retry int, address, token string) (*wxClient, error) {
+func NewWxClient(timeout, sleep time.Duration, retry int, address, token string) (*WxClient, error) {
 	if address == "" {
 		return nil, fmt.Errorf("address为空")
 	}
@@ -25,7 +25,7 @@ func NewWxClient(timeout, sleep time.Duration, retry int, address, token string)
 		return nil, fmt.Errorf("token为空")
 	}
 	httpClient := createHttpClient(timeout, sleep, retry, token)
-	return &wxClient{address: address, retry: retry, httpClient: httpClient}, nil
+	return &WxClient{address: address, retry: retry, httpClient: httpClient}, nil
 }
 
 func createHttpClient(timeout, sleep time.Duration, retry int, token string) *resty.Client {
@@ -66,7 +66,7 @@ func createHttpClient(timeout, sleep time.Duration, retry int, token string) *re
 	return httpClient
 }
 
-func (this wxClient) SendTemplateToTag(templateId string, tagId int, url string, data map[string]interface{}) (bool, error) {
+func (this WxClient) SendTemplateToTag(templateId string, tagId int, url string, data map[string]interface{}) (bool, error) {
 	var jsonString string
 	var object bool
 	var err error
@@ -83,7 +83,7 @@ func (this wxClient) SendTemplateToTag(templateId string, tagId int, url string,
 }
 
 //发送模板信息
-func (this wxClient) analysisSendTemplateToTag(jsonString string) (bool, error) {
+func (this WxClient) analysisSendTemplateToTag(jsonString string) (bool, error) {
 	type Response struct {
 		Code    int                             `json:"code"`
 		Message string                          `json:"message"`
@@ -103,7 +103,7 @@ func (this wxClient) analysisSendTemplateToTag(jsonString string) (bool, error) 
 }
 
 //发送模板信息
-func (this wxClient) requestSendTemplateToTag(templateId string, tagId int, url string, data map[string]interface{}) (string, error) {
+func (this WxClient) requestSendTemplateToTag(templateId string, tagId int, url string, data map[string]interface{}) (string, error) {
 	response, err := this.httpClient.R().
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetBody(map[string]interface{}{
