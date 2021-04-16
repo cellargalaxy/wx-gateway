@@ -5,7 +5,7 @@ do
     if [ ! -z $configPath ];then
         break
     fi
-    read -p "please enter token(required):" configPath
+    read -p "please enter config path(required):" configPath
 done
 
 if [ -z $listenPort ];then
