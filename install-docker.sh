@@ -20,7 +20,6 @@ echo 'listenPort:'$listenPort
 echo 'input any key go on, or control+c over'
 read
 
-
 echo 'stop container'
 docker stop wx_gateway
 echo 'remove container'
