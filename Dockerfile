@@ -1,5 +1,5 @@
 FROM golang:1.16 AS builder
-ENV GOPROXY="https://goproxy.io"
+ENV GOPROXY="https://goproxy.cn,direct"
 ENV GO111MODULE=on
 WORKDIR /src
 COPY . .
