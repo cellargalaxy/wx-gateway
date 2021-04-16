@@ -12,7 +12,7 @@ type Config struct {
 	Retry         int           `ini:"retry" json:"retry"`
 	Timeout       time.Duration `ini:"timeout" json:"timeout"`
 	Sleep         time.Duration `ini:"sleep" json:"sleep"`
-	ListenAddress string        `ini:"listen_address" json:"listen_address"`
+	ListenAddress string        `json:"listen_address"`
 	Token         string        `ini:"token" json:"token"`
 	AppId         string        `ini:"app_id" json:"app_id"`
 	AppSecret     string        `ini:"app_secret" json:"app_secret"`
