@@ -33,7 +33,8 @@ echo 'docker run'
 docker run -d \
 --restart=always \
 --name wx_gateway \
--v $configPath:/resources/config.ini \
 -p $listenPort:8990 \
+-v $configPath:/resources/config.ini \
+wx_gateway
 
 echo 'all finish'
