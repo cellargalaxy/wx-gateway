@@ -19,19 +19,19 @@
         <b-button disabled>allTemplate</b-button>
         <b-button variant="outline-info" @click="listAllTemplate">flush</b-button>
     </b-button-group>
-    <b-form-textarea :rows="allTemplateRow" v-model="allTemplateJson" @input="flushAllTemplateRow"></b-form-textarea>
+    <b-form-textarea disabled :rows="allTemplateRow" v-model="allTemplateJson" @input="flushAllTemplateRow"></b-form-textarea>
 
     <b-button-group size="sm" style="width: 100%">
         <b-button disabled>allTag</b-button>
         <b-button variant="outline-info" @click="listAllTag">flush</b-button>
     </b-button-group>
-    <b-form-textarea :rows="allTagRow" v-model="allTagJson" @input="flushAllTagRow"></b-form-textarea>
+    <b-form-textarea disabled :rows="allTagRow" v-model="allTagJson" @input="flushAllTagRow"></b-form-textarea>
 
     <b-button-group size="sm" style="width: 100%">
         <b-button disabled>allUserInfo</b-button>
         <b-button variant="outline-info" @click="listAllUserInfo">flush</b-button>
     </b-button-group>
-    <b-form-textarea :rows="allUserInfoRow" v-model="allUserInfoJson" @input="flushAllUserInfoRow"></b-form-textarea>
+    <b-form-textarea disabled :rows="allUserInfoRow" v-model="allUserInfoJson" @input="flushAllUserInfoRow"></b-form-textarea>
 
     <hr/>
 

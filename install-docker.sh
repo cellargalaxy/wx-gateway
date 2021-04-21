@@ -2,36 +2,38 @@
 
 while :
 do
-    read -p "please enter appId(required):" appId
-    if [ ! -z $appId ];then
+    if [ ! -z $configPath ];then
         break
     fi
+    read -p "please enter config path(required):" configPath
 done
-while :
-do
-    read -p "please enter appSecret(required):" appSecret
-    if [ ! -z $appSecret ];then
-        break
-    fi
-done
-while :
-do
-    read -p "please enter token(required):" token
-    if [ ! -z $token ];then
-        break
-    fi
-done
-read -p "please enter listen port(default:8990):" listenPort
+
+if [ -z $listenPort ];then
+    read -p "please enter listen port(default:8990):" listenPort
+fi
 if [ -z $listenPort ];then
     listenPort="8990"
 fi
 
-echo 'input any key go on,or control+c over'
+echo 'configPath:'$configPath
+echo 'listenPort:'$listenPort
+echo 'input any key go on, or control+c over'
 read
 
+echo 'stop container'
+docker stop wx_gateway
+echo 'remove container'
+docker rm wx_gateway
+echo 'remove image'
+docker rmi wx_gateway
 echo 'docker build'
 docker build -t wx_gateway .
 echo 'docker run'
-docker run -d --restart=always --name wx_gateway -p $listenPort:8990 -e TOKEN=$token -e APP_ID=$appId -e APP_SECRET=$appSecret wx_gateway
+docker run -d \
+--restart=always \
+--name wx_gateway \
+-p $listenPort:8990 \
+-v $configPath:/resources/config.ini \
+wx_gateway
 
 echo 'all finish'
