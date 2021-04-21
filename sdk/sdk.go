@@ -95,7 +95,7 @@ func (this WxClient) analysisSendTemplateToTag(jsonString string) (bool, error) 
 		logrus.WithFields(logrus.Fields{"err": err, "jsonString": jsonString}).Error("发送模板信息，解析响应异常")
 		return false, fmt.Errorf("发送模板信息，解析响应异常")
 	}
-	if response.Code != 1 {
+	if response.Code != model.SuccessCode {
 		logrus.WithFields(logrus.Fields{"jsonString": jsonString}).Error("发送模板信息，失败")
 		return false, fmt.Errorf("发送模板信息，失败: %+v", jsonString)
 	}

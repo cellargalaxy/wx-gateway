@@ -2,7 +2,7 @@ package controller
 
 import (
 	"fmt"
-	"github.com/cellargalaxy/wx-gateway/config"
+	"github.com/cellargalaxy/wx-gateway/model"
 	"github.com/cellargalaxy/wx-gateway/static"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -38,7 +38,7 @@ func Controller() error {
 
 	engine.GET("/api/listAllUserInfo", validate, listAllUserInfo)
 
-	err := engine.Run(config.Config.ListenAddress)
+	err := engine.Run(model.ListenAddress)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{"err": err}).Warn("web服务启动，异常")
 		return fmt.Errorf("web服务启动，异常: %+v", err)
@@ -53,13 +53,13 @@ func staticCache(c *gin.Context) {
 }
 
 func createErrResponse(message string, err error) map[string]interface{} {
-	return gin.H{"code": config.Config.FailCode, "message": fmt.Sprintf("%+v: %+v", message, err.Error()), "data": nil}
+	return gin.H{"code": model.FailCode, "message": fmt.Sprintf("%+v: %+v", message, err.Error()), "data": nil}
 }
 
 func createResponse(data interface{}, err error) map[string]interface{} {
 	if err == nil {
-		return gin.H{"code": config.Config.SuccessCode, "message": nil, "data": data}
+		return gin.H{"code": model.SuccessCode, "message": nil, "data": data}
 	} else {
-		return gin.H{"code": config.Config.FailCode, "message": err.Error(), "data": data}
+		return gin.H{"code": model.FailCode, "message": err.Error(), "data": data}
 	}
 }

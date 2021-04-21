@@ -14,13 +14,10 @@ const (
 )
 
 var Config = model.Config{
-	SuccessCode:   1,
-	FailCode:      2,
-	LogLevel:      logrus.InfoLevel,
-	Retry:         3,
-	Timeout:       3 * time.Second,
-	Sleep:         3 * time.Second,
-	ListenAddress: ":8990",
+	LogLevel: logrus.InfoLevel,
+	Retry:    3,
+	Timeout:  3 * time.Second,
+	Sleep:    3 * time.Second,
 }
 
 func init() {
@@ -56,8 +53,5 @@ func checkAndResetConfig() {
 	}
 	if Config.Sleep < 0 {
 		Config.Sleep = 3 * time.Second
-	}
-	if Config.ListenAddress == "" {
-		Config.ListenAddress = ":8990"
 	}
 }
