@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/wx-gateway/config"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -11,11 +12,12 @@ import (
 
 //发送tg信息
 func SendMsg(ctx context.Context, chatId int64, text string) (bool, error) {
+	content := fmt.Sprintf("```\n%+v\n```\nlogid: ```%+v```", text, util.GetLogId(ctx))
 	var jsonString string
 	var object bool
 	var err error
 	for i := 0; i < config.Config.Retry; i++ {
-		jsonString, err = requestSendMsg(ctx, chatId, text)
+		jsonString, err = requestSendMsg(ctx, chatId, content)
 		if err == nil {
 			object, err = analysisSendMsg(ctx, jsonString)
 			if err == nil {
@@ -48,6 +50,7 @@ func analysisSendMsg(ctx context.Context, jsonString string) (bool, error) {
 func requestSendMsg(ctx context.Context, chatId int64, text string) (string, error) {
 	response, err := httpClient.R().
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
+		SetQueryParam("parse_mode", "MarkdownV2").
 		SetQueryParam("chat_id", fmt.Sprint(chatId)).
 		SetQueryParam("text", text).
 		Get(fmt.Sprintf("https://api.telegram.org/bot%+v/sendMessage", config.Config.TgToken))
