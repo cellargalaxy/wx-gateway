@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/cellargalaxy/go_common/util"
-	"github.com/cellargalaxy/wx-gateway/controller"
+	"github.com/cellargalaxy/msg-gateway/controller"
 )
 
 func main() {

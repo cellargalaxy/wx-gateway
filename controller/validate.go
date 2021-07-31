@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/cellargalaxy/go_common/util"
-	"github.com/cellargalaxy/wx-gateway/config"
+	"github.com/cellargalaxy/msg-gateway/config"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )

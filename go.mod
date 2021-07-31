@@ -1,4 +1,4 @@
-module github.com/cellargalaxy/wx-gateway
+module github.com/cellargalaxy/msg-gateway
 
 go 1.16
 

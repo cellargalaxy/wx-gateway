@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/cellargalaxy/go_common/consd"
 	"github.com/cellargalaxy/go_common/util"
-	"github.com/cellargalaxy/wx-gateway/model"
+	"github.com/cellargalaxy/msg-gateway/model"
 	"github.com/go-resty/resty/v2"
 	"github.com/golang-jwt/jwt"
 	"github.com/sirupsen/logrus"

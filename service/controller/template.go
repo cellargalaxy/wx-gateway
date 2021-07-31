@@ -2,8 +2,8 @@ package controller
 
 import (
 	"context"
-	"github.com/cellargalaxy/wx-gateway/model"
-	"github.com/cellargalaxy/wx-gateway/service/wx"
+	"github.com/cellargalaxy/msg-gateway/model"
+	"github.com/cellargalaxy/msg-gateway/service/wx"
 )
 
 //获取全部模板

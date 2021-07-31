@@ -2,8 +2,8 @@ package controller
 
 import (
 	"github.com/cellargalaxy/go_common/util"
-	"github.com/cellargalaxy/wx-gateway/model"
-	"github.com/cellargalaxy/wx-gateway/service/controller"
+	"github.com/cellargalaxy/msg-gateway/model"
+	"github.com/cellargalaxy/msg-gateway/service/controller"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"net/http"
