@@ -3,7 +3,6 @@ package controller
 import (
 	"fmt"
 	"github.com/cellargalaxy/go_common/util"
-	"github.com/cellargalaxy/wx-gateway/config"
 	"github.com/cellargalaxy/wx-gateway/model"
 	"github.com/cellargalaxy/wx-gateway/static"
 	"github.com/gin-contrib/sessions"
