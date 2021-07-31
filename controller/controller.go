@@ -25,8 +25,6 @@ func Controller() error {
 	engine.Use(staticCache)
 	engine.StaticFS("/static", http.FS(static.StaticFile))
 
-	engine.POST("/api/login", login)
-
 	engine.GET("/api/listAllTemplate", validate, listAllTemplate)
 	engine.POST("/api/sendTemplateToTag", validate, sendTemplateToTag)
 
@@ -49,17 +47,5 @@ func Controller() error {
 func staticCache(c *gin.Context) {
 	if strings.HasPrefix(c.Request.RequestURI, "/static") {
 		c.Header("Cache-Control", "max-age=86400")
-	}
-}
-
-func createErrResponse(message string, err error) map[string]interface{} {
-	return gin.H{"code": config.Config.FailCode, "message": fmt.Sprintf("%+v: %+v", message, err.Error()), "data": nil}
-}
-
-func createResponse(data interface{}, err error) map[string]interface{} {
-	if err == nil {
-		return gin.H{"code": config.Config.SuccessCode, "message": nil, "data": data}
-	} else {
-		return gin.H{"code": config.Config.FailCode, "message": err.Error(), "data": data}
 	}
 }

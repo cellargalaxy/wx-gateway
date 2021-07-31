@@ -1,9 +1,9 @@
 package config
 
 import (
-	"fmt"
+	"context"
+	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/wx-gateway/model"
-	"github.com/cellargalaxy/wx-gateway/util"
 	"github.com/go-ini/ini"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -13,18 +13,11 @@ const (
 	configFilePath = "resources/config.ini"
 )
 
-var Config = model.Config{
-	SuccessCode:   1,
-	FailCode:      2,
-	LogLevel:      logrus.InfoLevel,
-	Retry:         3,
-	Timeout:       3 * time.Second,
-	Sleep:         3 * time.Second,
-	ListenAddress: ":8990",
-}
+var Config = model.Config{}
 
 func init() {
-	exist, _ := util.ExistAndIsFile(configFilePath)
+	ctx := context.Background()
+	exist, _ := util.ExistAndIsFile(ctx, configFilePath)
 	if exist {
 		cfg, err := ini.Load(configFilePath)
 		if err != nil {
@@ -35,19 +28,7 @@ func init() {
 			panic(err)
 		}
 	}
-	checkAndResetConfig()
-	if Config.Token == "" {
-		panic(fmt.Errorf("token配置为空"))
-	}
-	if Config.AppId == "" {
-		panic(fmt.Errorf("appId配置为空"))
-	}
-	if Config.AppSecret == "" {
-		panic(fmt.Errorf("appSecret配置为空"))
-	}
-}
 
-func checkAndResetConfig() {
 	if Config.LogLevel <= 0 || Config.LogLevel > logrus.TraceLevel {
 		Config.LogLevel = logrus.InfoLevel
 	}
@@ -59,5 +40,14 @@ func checkAndResetConfig() {
 	}
 	if Config.ListenAddress == "" {
 		Config.ListenAddress = ":8990"
+	}
+	if Config.Secret == "" {
+		panic("Secret配置为空")
+	}
+	if Config.AppId == "" {
+		panic("AppId配置为空")
+	}
+	if Config.AppSecret == "" {
+		panic("AppSecret配置为空")
 	}
 }

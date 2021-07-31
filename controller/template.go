@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/wx-gateway/model"
 	"github.com/cellargalaxy/wx-gateway/service/controller"
 	"github.com/gin-gonic/gin"
@@ -14,11 +15,11 @@ func listAllTemplate(context *gin.Context) {
 	err := context.BindQuery(&request)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{"request": request, "err": err}).Error("获取全部模板，请求参数解析异常")
-		context.JSON(http.StatusOK, createErrResponse("获取全部模板，请求参数解析异常", err))
+		context.JSON(http.StatusOK, util.CreateErrResponse(err.Error()))
 		return
 	}
 	logrus.WithFields(logrus.Fields{"request": request}).Info("获取全部模板")
-	context.JSON(http.StatusOK, createResponse(controller.ListAllTemplate(request)))
+	context.JSON(http.StatusOK, util.CreateResponse(controller.ListAllTemplate(request)))
 }
 
 //给标签用户发送模板消息
@@ -27,9 +28,9 @@ func sendTemplateToTag(context *gin.Context) {
 	err := context.BindJSON(&request)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{"request": request, "err": err}).Error("给标签用户发送模板消息，请求参数解析异常")
-		context.JSON(http.StatusOK, createErrResponse("给标签用户发送模板消息，请求参数解析异常", err))
+		context.JSON(http.StatusOK, util.CreateErrResponse(err.Error()))
 		return
 	}
 	logrus.WithFields(logrus.Fields{"request": request}).Info("给标签用户发送模板消息")
-	context.JSON(http.StatusOK, createResponse(controller.SendTemplateToTag(request)))
+	context.JSON(http.StatusOK, util.CreateResponse(controller.SendTemplateToTag(request)))
 }

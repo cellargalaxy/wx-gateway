@@ -1,9 +1,9 @@
 package test
 
 import (
+	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/wx-gateway/model"
 	"github.com/cellargalaxy/wx-gateway/service/controller"
-	"github.com/cellargalaxy/wx-gateway/util"
 	"testing"
 )
 

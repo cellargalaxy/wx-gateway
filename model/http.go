@@ -1,14 +1,5 @@
 package model
 
-const TokenHeadKey = "token"
-
-type LoginRequest struct {
-	Token string `form:"token" json:"token"`
-}
-
-type LoginResponse struct {
-}
-
 type ListAllTemplateRequest struct {
 }
 

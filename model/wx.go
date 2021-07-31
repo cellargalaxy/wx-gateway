@@ -1,6 +1,6 @@
 package model
 
-import "github.com/cellargalaxy/wx-gateway/util"
+import "github.com/cellargalaxy/go_common/util"
 
 type Template struct {
 	TemplateId string `json:"template_id"`
