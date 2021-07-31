@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/wx-gateway/config"
 	"github.com/cellargalaxy/wx-gateway/static"
 	"github.com/gin-contrib/sessions"
@@ -24,6 +25,9 @@ func Controller() error {
 
 	engine.Use(staticCache)
 	engine.StaticFS("/static", http.FS(static.StaticFile))
+
+	engine.GET("/ping", util.Ping)
+	engine.POST("/ping", validate, util.Ping)
 
 	engine.GET("/api/listAllTemplate", validate, listAllTemplate)
 	engine.POST("/api/sendTemplateToTag", validate, sendTemplateToTag)

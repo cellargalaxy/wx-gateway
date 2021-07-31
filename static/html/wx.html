@@ -9,7 +9,8 @@
 <body>
 <div id="vue">
     <b-input-group size="sm">
-        <b-form-input type="password" placeholder="token" v-model="token"></b-form-input>
+        <b-form-input type="password" placeholder="secret" v-model="secret"></b-form-input>
+        <b-form-input type="number" placeholder="tokenExp" v-model="tokenExp"></b-form-input>
         <b-button size="sm" variant="outline-primary" @click="login">login</b-button>
     </b-input-group>
 
@@ -19,7 +20,8 @@
         <b-button disabled>allTemplate</b-button>
         <b-button variant="outline-info" @click="listAllTemplate">flush</b-button>
     </b-button-group>
-    <b-form-textarea disabled :rows="allTemplateRow" v-model="allTemplateJson" @input="flushAllTemplateRow"></b-form-textarea>
+    <b-form-textarea disabled :rows="allTemplateRow" v-model="allTemplateJson"
+                     @input="flushAllTemplateRow"></b-form-textarea>
 
     <b-button-group size="sm" style="width: 100%">
         <b-button disabled>allTag</b-button>
@@ -31,7 +33,8 @@
         <b-button disabled>allUserInfo</b-button>
         <b-button variant="outline-info" @click="listAllUserInfo">flush</b-button>
     </b-button-group>
-    <b-form-textarea disabled :rows="allUserInfoRow" v-model="allUserInfoJson" @input="flushAllUserInfoRow"></b-form-textarea>
+    <b-form-textarea disabled :rows="allUserInfoRow" v-model="allUserInfoJson"
+                     @input="flushAllUserInfoRow"></b-form-textarea>
 
     <hr/>
 
@@ -92,13 +95,23 @@
 <script src="../js/bootstrap-vue-icons.min.js"></script>
 <script src="../js/qs.min.js"></script>
 <script src="../js/axios.min.js"></script>
+<script src="../js/sha256.min.js"></script>
+<script src="../js/jsrsasign-latest-all-min.js"></script>
+<script src="../js/util.js"></script>
 <script>
     const instance = axios.create({timeout: 60 * 1000})
+    instance.interceptors.request.use(
+        config => {
+            config.headers['Authorization'] = 'Bearer ' + enJwt()
+            return config
+        },
+        error => Promise.reject(error))
 
     let vue = new Vue({
         el: '#vue',
         data: {
-            token: '',
+            secret: '',
+            tokenExp: 3,
 
             allTemplateJson: '',
             allTemplateRow: 1,
@@ -129,11 +142,13 @@
         },
         methods: {
             login() {
-                let url = '../../api/login'
+                let url = '../../ping'
                 if (document.domain === 'localhost') {
                     url += '.json'
                 }
-                instance.post(url, {token: this.token})
+                setSecret(this.secret)
+                setTokenExp(this.tokenExp)
+                instance.post(url, {})
                     .then(response => {
                         const result = response.data
                         alert(JSON.stringify(result))
@@ -154,7 +169,7 @@
                     .then(response => {
                         let result = response.data
                         if (result.code !== 1) {
-                            alert(result.message)
+                            alert(result.msg)
                             return
                         }
                         this.allTemplateJson = JSON.stringify(result.data.list, null, 2)
@@ -174,7 +189,7 @@
                     .then(response => {
                         let result = response.data
                         if (result.code !== 1) {
-                            alert(result.message)
+                            alert(result.msg)
                             return
                         }
                         this.allTagJson = JSON.stringify(result.data.list, null, 2)
@@ -194,7 +209,7 @@
                     .then(response => {
                         let result = response.data
                         if (result.code !== 1) {
-                            alert(result.message)
+                            alert(result.msg)
                             return
                         }
                         this.allUserInfoJson = JSON.stringify(result.data.list, null, 2)

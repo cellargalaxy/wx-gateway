@@ -3,7 +3,7 @@ module github.com/cellargalaxy/wx-gateway
 go 1.16
 
 require (
-	github.com/cellargalaxy/go_common v0.0.0-20210731075552-8b04a1c652b0
+	github.com/cellargalaxy/go_common v0.0.0-20210731094622-6f6a8fd45a96
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-ini/ini v1.62.0

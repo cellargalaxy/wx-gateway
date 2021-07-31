@@ -12,5 +12,5 @@ func validate(c *gin.Context) {
 	util.Validate(c, validateHandler)
 }
 func validateHandler(c *gin.Context) (string, jwt.Claims, error) {
-	return config.Config.Secret, jwt.StandardClaims{}, nil
+	return config.Config.Secret, &jwt.StandardClaims{}, nil
 }
