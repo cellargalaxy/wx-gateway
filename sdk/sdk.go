@@ -108,13 +108,14 @@ func (this WxClient) analysisSendTemplateToTag(ctx context.Context, jsonString s
 
 //发送模板信息
 func (this WxClient) requestSendTemplateToTag(ctx context.Context, templateId string, tagId int, url string, data map[string]interface{}) (string, error) {
-	jwtToken, err := util.GenJWT(ctx, this.secret, jwt.StandardClaims{})
+	jwtToken, err := util.GenJWT(ctx, this.secret, jwt.StandardClaims{IssuedAt: time.Now().Unix(), ExpiresAt: time.Now().Unix() + 5})
 	if err != nil {
 		return "", err
 	}
 	response, err := this.httpClient.R().
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetHeader("Authorization", "Bearer "+jwtToken).
+		SetHeader(util.LogIdKey, fmt.Sprint(util.GetLogId(ctx))).
 		SetBody(map[string]interface{}{
 			"template_id": templateId,
 			"tag_id":      tagId,

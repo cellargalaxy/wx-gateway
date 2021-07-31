@@ -1,6 +1,7 @@
 package wx
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/cellargalaxy/wx-gateway/config"
@@ -10,19 +11,19 @@ import (
 )
 
 //给标签用户发送模板消息
-func SendTemplateToTag(templateId string, tagId int, url string, dataMap map[string]interface{}) ([]string, error) {
+func SendTemplateToTag(ctx context.Context, templateId string, tagId int, url string, dataMap map[string]interface{}) ([]string, error) {
 	data := map[string]model.TemplateData{}
 	for key, value := range dataMap {
 		data[key] = model.TemplateData{Value: value}
 	}
-	logrus.WithFields(logrus.Fields{"data": data}).Info("给标签用户发送模板消息")
-	openIds, err := ListOpenIdByTagId(tagId)
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"data": data}).Info("给标签用户发送模板消息")
+	openIds, err := ListOpenIdByTagId(ctx, tagId)
 	if err != nil {
 		return nil, err
 	}
 	var failOpenIds []string
 	for i := range openIds {
-		success, _ := SendTemplate(openIds[i], templateId, url, data)
+		success, _ := SendTemplate(ctx, openIds[i], templateId, url, data)
 		if !success {
 			failOpenIds = append(failOpenIds, openIds[i])
 		}
@@ -31,25 +32,25 @@ func SendTemplateToTag(templateId string, tagId int, url string, dataMap map[str
 }
 
 //获取全部模板
-func ListAllTemplate() ([]model.Template, error) {
+func ListAllTemplate(ctx context.Context) ([]model.Template, error) {
 	var jsonString string
 	var object []model.Template
 	var err error
 	for i := 0; i < config.Config.Retry; i++ {
-		jsonString, err = requestListAllTemplate()
+		jsonString, err = requestListAllTemplate(ctx)
 		if err == nil {
-			object, err = analysisListAllTemplate(jsonString)
+			object, err = analysisListAllTemplate(ctx, jsonString)
 			if err == nil {
 				return object, err
 			}
 		}
-		flushAccessToken()
+		flushAccessToken(ctx)
 	}
 	return object, err
 }
 
 //获取所有模板
-func analysisListAllTemplate(jsonString string) ([]model.Template, error) {
+func analysisListAllTemplate(ctx context.Context, jsonString string) ([]model.Template, error) {
 	type Response struct {
 		ErrCode      int              `json:"errcode"`
 		ErrMsg       string           `json:"errmsg"`
@@ -58,60 +59,60 @@ func analysisListAllTemplate(jsonString string) ([]model.Template, error) {
 	var response Response
 	err := json.Unmarshal([]byte(jsonString), &response)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"err": err, "jsonString": jsonString}).Error("获取所有模板，解析响应异常")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err, "jsonString": jsonString}).Error("获取所有模板，解析响应异常")
 		return nil, fmt.Errorf("获取所有模板，解析响应异常")
 	}
 	if response.ErrCode != 0 {
-		logrus.WithFields(logrus.Fields{"jsonString": jsonString}).Error("获取所有模板，失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"jsonString": jsonString}).Error("获取所有模板，失败")
 		return nil, fmt.Errorf("获取所有模板，失败")
 	}
 	return response.TemplateList, nil
 }
 
 //获取所有模板
-func requestListAllTemplate() (string, error) {
+func requestListAllTemplate(ctx context.Context) (string, error) {
 	response, err := httpClient.R().
-		SetQueryParam("access_token", GetAccessToken()).
+		SetQueryParam("access_token", GetAccessToken(ctx)).
 		Get("https://api.weixin.qq.com/cgi-bin/template/get_all_private_template")
 
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"err": err}).Error("获取所有模板，请求异常")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("获取所有模板，请求异常")
 		return "", fmt.Errorf("获取所有模板，请求异常")
 	}
 	if response == nil {
-		logrus.WithFields(logrus.Fields{"err": err}).Error("获取所有模板，响应为空")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("获取所有模板，响应为空")
 		return "", fmt.Errorf("获取所有模板，响应为空")
 	}
 	statusCode := response.StatusCode()
 	body := response.String()
-	logrus.WithFields(logrus.Fields{"statusCode": statusCode, "body": len(body)}).Info("获取所有模板，响应")
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"statusCode": statusCode, "body": len(body)}).Info("获取所有模板，响应")
 	if statusCode != http.StatusOK {
-		logrus.WithFields(logrus.Fields{"StatusCode": statusCode}).Error("获取所有模板，响应码失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"StatusCode": statusCode}).Error("获取所有模板，响应码失败")
 		return "", fmt.Errorf("获取所有模板，响应码失败: %+v", statusCode)
 	}
 	return body, nil
 }
 
 //发送模板信息
-func SendTemplate(openId string, templateId string, url string, data map[string]model.TemplateData) (bool, error) {
+func SendTemplate(ctx context.Context, openId string, templateId string, url string, data map[string]model.TemplateData) (bool, error) {
 	var jsonString string
 	var object bool
 	var err error
 	for i := 0; i < config.Config.Retry; i++ {
-		jsonString, err = requestSendTemplate(openId, templateId, url, data)
+		jsonString, err = requestSendTemplate(ctx, openId, templateId, url, data)
 		if err == nil {
-			object, err = analysisSendTemplate(jsonString)
+			object, err = analysisSendTemplate(ctx, jsonString)
 			if err == nil {
 				return object, err
 			}
 		}
-		flushAccessToken()
+		flushAccessToken(ctx)
 	}
 	return object, err
 }
 
 //发送模板信息
-func analysisSendTemplate(jsonString string) (bool, error) {
+func analysisSendTemplate(ctx context.Context, jsonString string) (bool, error) {
 	type Response struct {
 		ErrCode int    `json:"errcode"`
 		ErrMsg  string `json:"errmsg"`
@@ -119,21 +120,21 @@ func analysisSendTemplate(jsonString string) (bool, error) {
 	var response Response
 	err := json.Unmarshal([]byte(jsonString), &response)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"err": err, "jsonString": jsonString}).Error("发送模板信息，解析响应异常")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err, "jsonString": jsonString}).Error("发送模板信息，解析响应异常")
 		return false, fmt.Errorf("发送模板信息，解析响应异常")
 	}
 	if response.ErrCode != 0 {
-		logrus.WithFields(logrus.Fields{"jsonString": jsonString}).Error("发送模板信息，失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"jsonString": jsonString}).Error("发送模板信息，失败")
 		return false, fmt.Errorf("发送模板信息，失败")
 	}
 	return true, nil
 }
 
 //发送模板信息
-func requestSendTemplate(openId string, templateId string, url string, data map[string]model.TemplateData) (string, error) {
+func requestSendTemplate(ctx context.Context, openId string, templateId string, url string, data map[string]model.TemplateData) (string, error) {
 	response, err := httpClient.R().
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
-		SetQueryParam("access_token", GetAccessToken()).
+		SetQueryParam("access_token", GetAccessToken(ctx)).
 		SetBody(map[string]interface{}{
 			"touser":      openId,
 			"template_id": templateId,
@@ -143,18 +144,18 @@ func requestSendTemplate(openId string, templateId string, url string, data map[
 		Post("https://api.weixin.qq.com/cgi-bin/message/template/send")
 
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"err": err}).Error("发送模板信息，请求异常")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("发送模板信息，请求异常")
 		return "", fmt.Errorf("发送模板信息，请求异常")
 	}
 	if response == nil {
-		logrus.WithFields(logrus.Fields{"err": err}).Error("发送模板信息，响应为空")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("发送模板信息，响应为空")
 		return "", fmt.Errorf("发送模板信息，响应为空")
 	}
 	statusCode := response.StatusCode()
 	body := response.String()
-	logrus.WithFields(logrus.Fields{"statusCode": statusCode, "body": len(body)}).Info("发送模板信息，响应")
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"statusCode": statusCode, "body": len(body)}).Info("发送模板信息，响应")
 	if statusCode != http.StatusOK {
-		logrus.WithFields(logrus.Fields{"StatusCode": statusCode}).Error("发送模板信息，响应码失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"StatusCode": statusCode}).Error("发送模板信息，响应码失败")
 		return "", fmt.Errorf("发送模板信息，响应码失败: %+v", statusCode)
 	}
 	return body, nil

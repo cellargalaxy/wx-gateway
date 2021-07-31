@@ -5,10 +5,7 @@ import (
 	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/wx-gateway/model"
 	"github.com/cellargalaxy/wx-gateway/static"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -20,8 +17,8 @@ var secret = strconv.FormatFloat(rand.Float64(), 'E', -1, 64)
 
 func Controller() error {
 	engine := gin.Default()
-	store := cookie.NewStore([]byte(secret))
-	engine.Use(sessions.Sessions("session_id", store))
+	engine.Use(util.GinLogId)
+	engine.Use(util.GinLog)
 
 	engine.Use(staticCache)
 	engine.StaticFS("/static", http.FS(static.StaticFile))
@@ -42,8 +39,7 @@ func Controller() error {
 
 	err := engine.Run(model.ListenAddress)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"err": err}).Warn("web服务启动，异常")
-		return fmt.Errorf("web服务启动，异常: %+v", err)
+		panic(fmt.Errorf("web服务启动，异常: %+v", err))
 	}
 	return nil
 }

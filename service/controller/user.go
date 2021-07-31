@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"context"
 	"github.com/cellargalaxy/wx-gateway/model"
 	"github.com/cellargalaxy/wx-gateway/service/wx"
 )
 
 //获取全部用户信息
-func ListAllUserInfo(request model.ListAllUserInfoRequest) (*model.ListAllUserInfoResponse, error) {
-	list, err := wx.ListAllUserInfo()
+func ListAllUserInfo(ctx context.Context, request model.ListAllUserInfoRequest) (*model.ListAllUserInfoResponse, error) {
+	list, err := wx.ListAllUserInfo(ctx)
 	return &model.ListAllUserInfoResponse{List: list}, err
 }

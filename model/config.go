@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/cellargalaxy/go_common/util"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -18,4 +19,8 @@ type Config struct {
 	Secret        string        `ini:"secret" json:"secret"`
 	AppId         string        `ini:"app_id" json:"app_id"`
 	AppSecret     string        `ini:"app_secret" json:"app_secret"`
+}
+
+func (this Config) String() string {
+	return util.ToJsonString(this)
 }
