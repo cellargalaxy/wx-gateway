@@ -1,11 +1,15 @@
 package sdk
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/cellargalaxy/go_common/consd"
+	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/wx-gateway/model"
 	"github.com/go-resty/resty/v2"
+	"github.com/golang-jwt/jwt"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
@@ -13,27 +17,28 @@ import (
 
 type WxClient struct {
 	address    string
+	secret     string
 	retry      int
 	httpClient *resty.Client
 }
 
-func NewWxClient(timeout, sleep time.Duration, retry int, address, token string) (*WxClient, error) {
+func NewWxClient(timeout, sleep time.Duration, retry int, address, secret string) (*WxClient, error) {
 	if address == "" {
 		return nil, fmt.Errorf("address为空")
 	}
-	if token == "" {
-		return nil, fmt.Errorf("token为空")
+	if secret == "" {
+		return nil, fmt.Errorf("secret为空")
 	}
-	httpClient := createHttpClient(timeout, sleep, retry, token)
-	return &WxClient{address: address, retry: retry, httpClient: httpClient}, nil
+	httpClient := createHttpClient(timeout, sleep, retry)
+	return &WxClient{address: address, secret: secret, retry: retry, httpClient: httpClient}, nil
 }
 
-func createHttpClient(timeout, sleep time.Duration, retry int, token string) *resty.Client {
+func createHttpClient(timeout, sleep time.Duration, retry int) *resty.Client {
 	httpClient := resty.New().
 		SetTimeout(timeout).
 		SetRetryCount(retry).
 		SetRetryWaitTime(sleep).
-		SetRetryMaxWaitTime(5*time.Minute).
+		SetRetryMaxWaitTime(5 * time.Minute).
 		AddRetryCondition(func(response *resty.Response, err error) bool {
 			var statusCode int
 			if response != nil {
@@ -61,19 +66,18 @@ func createHttpClient(timeout, sleep time.Duration, retry int, token string) *re
 			logrus.WithFields(logrus.Fields{"attempt": attempt, "duration": duration}).Warn("HTTP请求异常，休眠重试")
 			return duration, nil
 		}).
-		SetHeader(model.TokenHeadKey, token).
 		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	return httpClient
 }
 
-func (this WxClient) SendTemplateToTag(templateId string, tagId int, url string, data map[string]interface{}) (bool, error) {
+func (this WxClient) SendTemplateToTag(ctx context.Context, templateId string, tagId int, url string, data map[string]interface{}) (bool, error) {
 	var jsonString string
 	var object bool
 	var err error
 	for i := 0; i < this.retry; i++ {
-		jsonString, err = this.requestSendTemplateToTag(templateId, tagId, url, data)
+		jsonString, err = this.requestSendTemplateToTag(ctx, templateId, tagId, url, data)
 		if err == nil {
-			object, err = this.analysisSendTemplateToTag(jsonString)
+			object, err = this.analysisSendTemplateToTag(ctx, jsonString)
 			if err == nil {
 				return object, err
 			}
@@ -83,7 +87,7 @@ func (this WxClient) SendTemplateToTag(templateId string, tagId int, url string,
 }
 
 //发送模板信息
-func (this WxClient) analysisSendTemplateToTag(jsonString string) (bool, error) {
+func (this WxClient) analysisSendTemplateToTag(ctx context.Context, jsonString string) (bool, error) {
 	type Response struct {
 		Code    int                             `json:"code"`
 		Message string                          `json:"message"`
@@ -92,20 +96,25 @@ func (this WxClient) analysisSendTemplateToTag(jsonString string) (bool, error) 
 	var response Response
 	err := json.Unmarshal([]byte(jsonString), &response)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"err": err, "jsonString": jsonString}).Error("发送模板信息，解析响应异常")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err, "jsonString": jsonString}).Error("发送模板信息，解析响应异常")
 		return false, fmt.Errorf("发送模板信息，解析响应异常")
 	}
-	if response.Code != model.SuccessCode {
-		logrus.WithFields(logrus.Fields{"jsonString": jsonString}).Error("发送模板信息，失败")
+	if response.Code != consd.HttpSuccessCode {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"jsonString": jsonString}).Error("发送模板信息，失败")
 		return false, fmt.Errorf("发送模板信息，失败: %+v", jsonString)
 	}
 	return true, nil
 }
 
 //发送模板信息
-func (this WxClient) requestSendTemplateToTag(templateId string, tagId int, url string, data map[string]interface{}) (string, error) {
+func (this WxClient) requestSendTemplateToTag(ctx context.Context, templateId string, tagId int, url string, data map[string]interface{}) (string, error) {
+	jwtToken, err := util.GenJWT(ctx, this.secret, jwt.StandardClaims{})
+	if err != nil {
+		return "", err
+	}
 	response, err := this.httpClient.R().
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
+		SetHeader("Authorization", "Bearer "+jwtToken).
 		SetBody(map[string]interface{}{
 			"template_id": templateId,
 			"tag_id":      tagId,
@@ -115,18 +124,18 @@ func (this WxClient) requestSendTemplateToTag(templateId string, tagId int, url 
 		Post(this.address + "/api/sendTemplateToTag")
 
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"err": err}).Error("发送模板信息，请求异常")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("发送模板信息，请求异常")
 		return "", fmt.Errorf("发送模板信息，请求异常")
 	}
 	if response == nil {
-		logrus.WithFields(logrus.Fields{"err": err}).Error("发送模板信息，响应为空")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("发送模板信息，响应为空")
 		return "", fmt.Errorf("发送模板信息，响应为空")
 	}
 	statusCode := response.StatusCode()
 	body := response.String()
-	logrus.WithFields(logrus.Fields{"statusCode": statusCode, "body": body}).Info("发送模板信息，响应")
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"statusCode": statusCode, "body": body}).Info("发送模板信息，响应")
 	if statusCode != http.StatusOK {
-		logrus.WithFields(logrus.Fields{"StatusCode": statusCode}).Error("发送模板信息，响应码失败")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"StatusCode": statusCode}).Error("发送模板信息，响应码失败")
 		return "", fmt.Errorf("发送模板信息，响应码失败: %+v", statusCode)
 	}
 	return body, nil
