@@ -59,8 +59,8 @@ func analysisAccessToken(ctx context.Context, jsonString string) (string, error)
 //获取accessToken
 func requestAccessToken(ctx context.Context) (string, error) {
 	response, err := httpClient.R().
-		SetQueryParam("appid", config.Config.AppId).
-		SetQueryParam("secret", config.Config.AppSecret).
+		SetQueryParam("appid", config.Config.WxAppId).
+		SetQueryParam("secret", config.Config.WxAppSecret).
 		SetQueryParam("grant_type", "client_credential").
 		Get("https://api.weixin.qq.com/cgi-bin/token")
 

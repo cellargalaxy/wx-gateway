@@ -131,3 +131,19 @@ type ListAllUserInfoResponse struct {
 func (this ListAllUserInfoResponse) String() string {
 	return util.ToJsonString(this)
 }
+
+type SendTgMsg2ConfigChatIdRequest struct {
+	Text string `form:"text" json:"text"`
+}
+
+func (this SendTgMsg2ConfigChatIdRequest) String() string {
+	return util.ToJsonString(this)
+}
+
+type SendTgMsg2ConfigChatIdResponse struct {
+	Result bool `json:"result"`
+}
+
+func (this SendTgMsg2ConfigChatIdResponse) String() string {
+	return util.ToJsonString(this)
+}

@@ -15,14 +15,14 @@ import (
 	"time"
 )
 
-type WxClient struct {
+type MsgClient struct {
 	address    string
 	secret     string
 	retry      int
 	httpClient *resty.Client
 }
 
-func NewWxClient(timeout, sleep time.Duration, retry int, address, secret string) (*WxClient, error) {
+func NewMsgClient(timeout, sleep time.Duration, retry int, address, secret string) (*MsgClient, error) {
 	if address == "" {
 		return nil, fmt.Errorf("address为空")
 	}
@@ -30,7 +30,7 @@ func NewWxClient(timeout, sleep time.Duration, retry int, address, secret string
 		return nil, fmt.Errorf("secret为空")
 	}
 	httpClient := createHttpClient(timeout, sleep, retry)
-	return &WxClient{address: address, secret: secret, retry: retry, httpClient: httpClient}, nil
+	return &MsgClient{address: address, secret: secret, retry: retry, httpClient: httpClient}, nil
 }
 
 func createHttpClient(timeout, sleep time.Duration, retry int) *resty.Client {
@@ -70,14 +70,15 @@ func createHttpClient(timeout, sleep time.Duration, retry int) *resty.Client {
 	return httpClient
 }
 
-func (this WxClient) SendTemplateToTag(ctx context.Context, templateId string, tagId int, url string, data map[string]interface{}) (bool, error) {
+//给配置chatId发送tg信息
+func (this MsgClient) SendTgMsg2ConfigChatId(ctx context.Context, text string) (bool, error) {
 	var jsonString string
 	var object bool
 	var err error
 	for i := 0; i < this.retry; i++ {
-		jsonString, err = this.requestSendTemplateToTag(ctx, templateId, tagId, url, data)
+		jsonString, err = this.requestSendTgMsg2ConfigChatId(ctx, text)
 		if err == nil {
-			object, err = this.analysisSendTemplateToTag(ctx, jsonString)
+			object, err = this.analysisSendTgMsg2ConfigChatId(ctx, jsonString)
 			if err == nil {
 				return object, err
 			}
@@ -86,12 +87,82 @@ func (this WxClient) SendTemplateToTag(ctx context.Context, templateId string, t
 	return object, err
 }
 
-//发送模板信息
-func (this WxClient) analysisSendTemplateToTag(ctx context.Context, jsonString string) (bool, error) {
+//给配置chatId发送tg信息
+func (this MsgClient) analysisSendTgMsg2ConfigChatId(ctx context.Context, jsonString string) (bool, error) {
 	type Response struct {
-		Code    int                             `json:"code"`
-		Message string                          `json:"message"`
-		Data    model.SendTemplateToTagResponse `json:"data"`
+		Code int                                 `json:"code"`
+		Msg  string                              `json:"msg"`
+		Data model.SendTgMsg2ConfigChatIdRequest `json:"data"`
+	}
+	var response Response
+	err := json.Unmarshal([]byte(jsonString), &response)
+	if err != nil {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err, "jsonString": jsonString}).Error("给配置chatId发送tg信息，解析响应异常")
+		return false, fmt.Errorf("给配置chatId发送tg信息，解析响应异常")
+	}
+	if response.Code != consd.HttpSuccessCode {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"jsonString": jsonString}).Error("给配置chatId发送tg信息，失败")
+		return false, fmt.Errorf("给配置chatId发送tg信息，失败: %+v", jsonString)
+	}
+	return true, nil
+}
+
+//给配置chatId发送tg信息
+func (this MsgClient) requestSendTgMsg2ConfigChatId(ctx context.Context, text string) (string, error) {
+	jwtToken, err := util.GenJWT(ctx, this.secret, jwt.StandardClaims{IssuedAt: time.Now().Unix(), ExpiresAt: time.Now().Unix() + 5})
+	if err != nil {
+		return "", err
+	}
+	response, err := this.httpClient.R().
+		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
+		SetHeader("Authorization", "Bearer "+jwtToken).
+		SetHeader(util.LogIdKey, fmt.Sprint(util.GetLogId(ctx))).
+		SetBody(map[string]interface{}{
+			"text": text,
+		}).
+		Post(this.address + "/api/sendTgMsg2ConfigChatId")
+
+	if err != nil {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("给配置chatId发送tg信息，请求异常")
+		return "", fmt.Errorf("给配置chatId发送tg信息，请求异常")
+	}
+	if response == nil {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("给配置chatId发送tg信息，响应为空")
+		return "", fmt.Errorf("给配置chatId发送tg信息，响应为空")
+	}
+	statusCode := response.StatusCode()
+	body := response.String()
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"statusCode": statusCode, "body": body}).Info("给配置chatId发送tg信息，响应")
+	if statusCode != http.StatusOK {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"StatusCode": statusCode}).Error("给配置chatId发送tg信息，响应码失败")
+		return "", fmt.Errorf("给配置chatId发送tg信息，响应码失败: %+v", statusCode)
+	}
+	return body, nil
+}
+
+//发送微信模板信息
+func (this MsgClient) SendWxTemplateToTag(ctx context.Context, templateId string, tagId int, url string, data map[string]interface{}) (bool, error) {
+	var jsonString string
+	var object bool
+	var err error
+	for i := 0; i < this.retry; i++ {
+		jsonString, err = this.requestSendWxTemplateToTag(ctx, templateId, tagId, url, data)
+		if err == nil {
+			object, err = this.analysisSendWxTemplateToTag(ctx, jsonString)
+			if err == nil {
+				return object, err
+			}
+		}
+	}
+	return object, err
+}
+
+//发送微信模板信息
+func (this MsgClient) analysisSendWxTemplateToTag(ctx context.Context, jsonString string) (bool, error) {
+	type Response struct {
+		Code int                             `json:"code"`
+		Msg  string                          `json:"msg"`
+		Data model.SendTemplateToTagResponse `json:"data"`
 	}
 	var response Response
 	err := json.Unmarshal([]byte(jsonString), &response)
@@ -106,8 +177,8 @@ func (this WxClient) analysisSendTemplateToTag(ctx context.Context, jsonString s
 	return true, nil
 }
 
-//发送模板信息
-func (this WxClient) requestSendTemplateToTag(ctx context.Context, templateId string, tagId int, url string, data map[string]interface{}) (string, error) {
+//发送微信模板信息
+func (this MsgClient) requestSendWxTemplateToTag(ctx context.Context, templateId string, tagId int, url string, data map[string]interface{}) (string, error) {
 	jwtToken, err := util.GenJWT(ctx, this.secret, jwt.StandardClaims{IssuedAt: time.Now().Unix(), ExpiresAt: time.Now().Unix() + 5})
 	if err != nil {
 		return "", err

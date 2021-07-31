@@ -6,14 +6,9 @@ import (
 	"github.com/cellargalaxy/wx-gateway/model"
 	"github.com/cellargalaxy/wx-gateway/static"
 	"github.com/gin-gonic/gin"
-	"math/rand"
 	"net/http"
-	"strconv"
 	"strings"
 )
-
-var secretKey = "secret"
-var secret = strconv.FormatFloat(rand.Float64(), 'E', -1, 64)
 
 func Controller() error {
 	engine := gin.Default()
@@ -36,6 +31,8 @@ func Controller() error {
 	engine.POST("/api/deleteTagFromUser", validate, deleteTagFromUser)
 
 	engine.GET("/api/listAllUserInfo", validate, listAllUserInfo)
+
+	engine.POST("/api/sendTgMsg2ConfigChatId", validate, sendTgMsg2ConfigChatId)
 
 	err := engine.Run(model.ListenAddress)
 	if err != nil {

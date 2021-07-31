@@ -44,10 +44,4 @@ func init() {
 	if Config.Secret == "" {
 		panic("Secret配置为空")
 	}
-	if Config.AppId == "" {
-		panic("AppId配置为空")
-	}
-	if Config.AppSecret == "" {
-		panic("AppSecret配置为空")
-	}
 }
