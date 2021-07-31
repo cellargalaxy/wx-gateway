@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+const (
+	ListenAddress = ":8990"
+)
+
 type Config struct {
 	LogLevel      logrus.Level  `ini:"log_level" json:"log_level"`
 	Retry         int           `ini:"retry" json:"retry"`

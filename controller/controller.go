@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/wx-gateway/config"
+	"github.com/cellargalaxy/wx-gateway/model"
 	"github.com/cellargalaxy/wx-gateway/static"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -40,7 +41,7 @@ func Controller() error {
 
 	engine.GET("/api/listAllUserInfo", validate, listAllUserInfo)
 
-	err := engine.Run(config.Config.ListenAddress)
+	err := engine.Run(model.ListenAddress)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{"err": err}).Warn("web服务启动，异常")
 		return fmt.Errorf("web服务启动，异常: %+v", err)
