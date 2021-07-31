@@ -21,19 +21,19 @@ echo 'input any key go on, or control+c over'
 read
 
 echo 'stop container'
-docker stop wx_gateway
+docker stop msg_gateway
 echo 'remove container'
-docker rm wx_gateway
+docker rm msg_gateway
 echo 'remove image'
-docker rmi wx_gateway
+docker rmi msg_gateway
 echo 'docker build'
-docker build -t wx_gateway .
+docker build -t msg_gateway .
 echo 'docker run'
 docker run -d \
 --restart=always \
---name wx_gateway \
+--name msg_gateway \
 -p $listenPort:8990 \
 -v $configPath:/resources/config.ini \
-wx_gateway
+msg_gateway
 
 echo 'all finish'

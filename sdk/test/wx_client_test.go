@@ -9,7 +9,7 @@ import (
 )
 
 func TestWxClient(test *testing.T) {
-	util.InitLog("wx_gateway.log")
+	util.InitLog("msg_gateway.log")
 	ctx := context.Background()
 	ctx = util.SetLogId(ctx)
 	wxClient, err := sdk.NewWxClient(time.Second*3, time.Second*3, 3, "http://127.0.0.1:8990", "secret")

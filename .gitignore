@@ -15,5 +15,5 @@
 # vendor/
 
 .idea
-wx_gateway.log
-test/wx_gateway.log
+msg_gateway.log
+test/msg_gateway.log

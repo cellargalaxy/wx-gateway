@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	util.InitLog("wx_gateway.log")
+	util.InitLog("msg_gateway.log")
 	err := controller.Controller()
 	if err != nil {
 		panic(err)
