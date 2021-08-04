@@ -36,6 +36,22 @@ func (this SendTemplateToTagResponse) String() string {
 	return util.ToJsonString(this)
 }
 
+type SendTemplateToCommonTagRequest struct {
+	Text string `form:"text" json:"text"`
+}
+
+func (this SendTemplateToCommonTagRequest) String() string {
+	return util.ToJsonString(this)
+}
+
+type SendTemplateToCommonTagResponse struct {
+	FailOpenIds []string `json:"fail_open_ids"`
+}
+
+func (this SendTemplateToCommonTagResponse) String() string {
+	return util.ToJsonString(this)
+}
+
 type CreateTagRequest struct {
 	Tag string `form:"tag" json:"tag"`
 }

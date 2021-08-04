@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/msg-gateway/model"
 	"github.com/cellargalaxy/msg-gateway/service/controller"
@@ -8,10 +9,12 @@ import (
 )
 
 func TestCreateTag(test *testing.T) {
+	ctx := context.Background()
+	ctx = util.SetLogId(ctx)
 	request := model.CreateTagRequest{
 		Tag: "",
 	}
-	response, err := controller.CreateTag(request)
+	response, err := controller.CreateTag(ctx, request)
 	test.Logf("response: %+v\r\n", util.ToJsonIndent(response))
 	if err != nil {
 		test.Error(err)
@@ -20,10 +23,12 @@ func TestCreateTag(test *testing.T) {
 }
 
 func TestDeleteTag(test *testing.T) {
+	ctx := context.Background()
+	ctx = util.SetLogId(ctx)
 	request := model.DeleteTagRequest{
 		TagId: 0,
 	}
-	response, err := controller.DeleteTag(request)
+	response, err := controller.DeleteTag(ctx, request)
 	test.Logf("response: %+v\r\n", util.ToJsonIndent(response))
 	if err != nil {
 		test.Error(err)
@@ -32,8 +37,10 @@ func TestDeleteTag(test *testing.T) {
 }
 
 func TestListAllTag(test *testing.T) {
+	ctx := context.Background()
+	ctx = util.SetLogId(ctx)
 	request := model.ListAllTagRequest{}
-	response, err := controller.ListAllTag(request)
+	response, err := controller.ListAllTag(ctx, request)
 	test.Logf("response: %+v\r\n", util.ToJsonIndent(response))
 	if err != nil {
 		test.Error(err)
@@ -42,11 +49,13 @@ func TestListAllTag(test *testing.T) {
 }
 
 func TestAddTagToUser(test *testing.T) {
+	ctx := context.Background()
+	ctx = util.SetLogId(ctx)
 	request := model.AddTagToUserRequest{
 		TagId:  0,
 		OpenId: "",
 	}
-	response, err := controller.AddTagToUser(request)
+	response, err := controller.AddTagToUser(ctx, request)
 	test.Logf("response: %+v\r\n", util.ToJsonIndent(response))
 	if err != nil {
 		test.Error(err)
@@ -55,11 +64,13 @@ func TestAddTagToUser(test *testing.T) {
 }
 
 func TestDeleteTagFromUser(test *testing.T) {
+	ctx := context.Background()
+	ctx = util.SetLogId(ctx)
 	request := model.DeleteTagFromUserRequest{
 		TagId:  0,
 		OpenId: "",
 	}
-	response, err := controller.DeleteTagFromUser(request)
+	response, err := controller.DeleteTagFromUser(ctx, request)
 	test.Logf("response: %+v\r\n", util.ToJsonIndent(response))
 	if err != nil {
 		test.Error(err)

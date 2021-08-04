@@ -10,14 +10,14 @@ import (
 )
 
 //给配置chatId发送tg信息
-func sendTgMsg2ConfigChatId(context *gin.Context) {
+func sendTgMsg2ConfigChatId(ctx *gin.Context) {
 	var request model.SendTgMsg2ConfigChatIdRequest
-	err := context.BindJSON(&request)
+	err := ctx.BindJSON(&request)
 	if err != nil {
-		logrus.WithContext(context).WithFields(logrus.Fields{"request": request, "err": err}).Error("给配置chatId发送tg信息，请求参数解析异常")
-		context.JSON(http.StatusOK, util.CreateErrResponse(err.Error()))
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"request": request, "err": err}).Error("给配置chatId发送tg信息，请求参数解析异常")
+		ctx.JSON(http.StatusOK, util.CreateErrResponse(err.Error()))
 		return
 	}
-	logrus.WithContext(context).WithFields(logrus.Fields{"request": request}).Info("给配置chatId发送tg信息")
-	context.JSON(http.StatusOK, util.CreateResponse(controller.SendTgMsg2ConfigChatId(context, request)))
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"request": request}).Info("给配置chatId发送tg信息")
+	ctx.JSON(http.StatusOK, util.CreateResponse(controller.SendTgMsg2ConfigChatId(ctx, request)))
 }

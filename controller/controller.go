@@ -14,15 +14,15 @@ func Controller() error {
 	engine := gin.Default()
 	engine.Use(util.GinLogId)
 	engine.Use(util.GinLog)
+	engine.GET("/ping", util.Ping)
+	engine.POST("/ping", validate, util.Ping)
 
 	engine.Use(staticCache)
 	engine.StaticFS("/static", http.FS(static.StaticFile))
 
-	engine.GET("/ping", util.Ping)
-	engine.POST("/ping", validate, util.Ping)
-
 	engine.GET("/api/listAllTemplate", validate, listAllTemplate)
 	engine.POST("/api/sendTemplateToTag", validate, sendTemplateToTag)
+	engine.POST("/api/sendTemplateToCommonTag", validate, sendTemplateToCommonTag)
 
 	engine.POST("/api/createTag", validate, createTag)
 	engine.POST("/api/deleteTag", validate, deleteTag)

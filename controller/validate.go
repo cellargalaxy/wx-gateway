@@ -8,9 +8,9 @@ import (
 )
 
 //登录检查
-func validate(c *gin.Context) {
-	util.Validate(c, validateHandler)
+func validate(ctx *gin.Context) {
+	util.Validate(ctx, validateHandler)
 }
-func validateHandler(c *gin.Context) (string, jwt.Claims, error) {
+func validateHandler(ctx *gin.Context) (string, jwt.Claims, error) {
 	return config.Config.Secret, &jwt.StandardClaims{}, nil
 }

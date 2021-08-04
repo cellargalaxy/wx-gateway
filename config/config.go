@@ -38,9 +38,6 @@ func init() {
 	if Config.Sleep < 0 {
 		Config.Sleep = 3 * time.Second
 	}
-	if Config.ListenAddress == "" {
-		Config.ListenAddress = ":8990"
-	}
 	if Config.Secret == "" {
 		panic("Secret配置为空")
 	}

@@ -4,11 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/cellargalaxy/go_common/util"
 	"github.com/cellargalaxy/msg-gateway/config"
 	"github.com/cellargalaxy/msg-gateway/model"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
+
+//给通用标签用户发送模板消息
+func SendTemplateToCommonTag(ctx context.Context, text string) ([]string, error) {
+	dataMap := make(map[string]interface{})
+	dataMap["logid"] = util.GetLogId(ctx)
+	dataMap["text"] = text
+	return SendTemplateToTag(ctx, config.Config.WxCommonTempId, config.Config.WxCommonTagId, fmt.Sprintf("https://wx2.qq.com?logid=%+v&text=%+v", dataMap["logid"], dataMap["text"]), dataMap)
+}
 
 //给标签用户发送模板消息
 func SendTemplateToTag(ctx context.Context, templateId string, tagId int, url string, dataMap map[string]interface{}) ([]string, error) {

@@ -167,12 +167,12 @@ func (this MsgClient) analysisSendWxTemplateToTag(ctx context.Context, jsonStrin
 	var response Response
 	err := json.Unmarshal([]byte(jsonString), &response)
 	if err != nil {
-		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err, "jsonString": jsonString}).Error("发送模板信息，解析响应异常")
-		return false, fmt.Errorf("发送模板信息，解析响应异常")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err, "jsonString": jsonString}).Error("发送微信模板信息，解析响应异常")
+		return false, fmt.Errorf("发送微信模板信息，解析响应异常")
 	}
 	if response.Code != consd.HttpSuccessCode {
-		logrus.WithContext(ctx).WithFields(logrus.Fields{"jsonString": jsonString}).Error("发送模板信息，失败")
-		return false, fmt.Errorf("发送模板信息，失败: %+v", jsonString)
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"jsonString": jsonString}).Error("发送微信模板信息，失败")
+		return false, fmt.Errorf("发送微信模板信息，失败: %+v", jsonString)
 	}
 	return true, nil
 }
@@ -196,19 +196,74 @@ func (this MsgClient) requestSendWxTemplateToTag(ctx context.Context, templateId
 		Post(this.address + "/api/sendTemplateToTag")
 
 	if err != nil {
-		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("发送模板信息，请求异常")
-		return "", fmt.Errorf("发送模板信息，请求异常")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("发送微信模板信息，请求异常")
+		return "", fmt.Errorf("发送微信模板信息，请求异常")
 	}
 	if response == nil {
-		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("发送模板信息，响应为空")
-		return "", fmt.Errorf("发送模板信息，响应为空")
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("发送微信模板信息，响应为空")
+		return "", fmt.Errorf("发送微信模板信息，响应为空")
 	}
 	statusCode := response.StatusCode()
 	body := response.String()
-	logrus.WithContext(ctx).WithFields(logrus.Fields{"statusCode": statusCode, "body": body}).Info("发送模板信息，响应")
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"statusCode": statusCode, "body": body}).Info("发送微信模板信息，响应")
 	if statusCode != http.StatusOK {
-		logrus.WithContext(ctx).WithFields(logrus.Fields{"StatusCode": statusCode}).Error("发送模板信息，响应码失败")
-		return "", fmt.Errorf("发送模板信息，响应码失败: %+v", statusCode)
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"StatusCode": statusCode}).Error("发送微信模板信息，响应码失败")
+		return "", fmt.Errorf("发送微信模板信息，响应码失败: %+v", statusCode)
+	}
+	return body, nil
+}
+
+//发送微信通用模板信息
+func (this MsgClient) SendTemplateToCommonTag(ctx context.Context, text string) (bool, error) {
+	var jsonString string
+	var object bool
+	var err error
+	for i := 0; i < this.retry; i++ {
+		jsonString, err = this.requestSendTemplateToCommonTag(ctx, text)
+		if err == nil {
+			object, err = this.analysisSendTemplateToCommonTag(ctx, jsonString)
+			if err == nil {
+				return object, err
+			}
+		}
+	}
+	return object, err
+}
+
+//发送微信通用模板信息
+func (this MsgClient) analysisSendTemplateToCommonTag(ctx context.Context, jsonString string) (bool, error) {
+	return this.analysisSendWxTemplateToTag(ctx, jsonString)
+}
+
+//发送微信通用模板信息
+func (this MsgClient) requestSendTemplateToCommonTag(ctx context.Context, text string) (string, error) {
+	jwtToken, err := util.GenJWT(ctx, this.secret, jwt.StandardClaims{IssuedAt: time.Now().Unix(), ExpiresAt: time.Now().Unix() + 5})
+	if err != nil {
+		return "", err
+	}
+	response, err := this.httpClient.R().
+		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
+		SetHeader("Authorization", "Bearer "+jwtToken).
+		SetHeader(util.LogIdKey, fmt.Sprint(util.GetLogId(ctx))).
+		SetBody(map[string]interface{}{
+			"text": text,
+		}).
+		Post(this.address + "/api/sendTemplateToCommonTag")
+
+	if err != nil {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("发送微信通用模板信息，请求异常")
+		return "", fmt.Errorf("发送微信通用模板信息，请求异常")
+	}
+	if response == nil {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"err": err}).Error("发送微信通用模板信息，响应为空")
+		return "", fmt.Errorf("发送微信通用模板信息，响应为空")
+	}
+	statusCode := response.StatusCode()
+	body := response.String()
+	logrus.WithContext(ctx).WithFields(logrus.Fields{"statusCode": statusCode, "body": body}).Info("发送微信通用模板信息，响应")
+	if statusCode != http.StatusOK {
+		logrus.WithContext(ctx).WithFields(logrus.Fields{"StatusCode": statusCode}).Error("发送微信通用模板信息，响应码失败")
+		return "", fmt.Errorf("发送微信通用模板信息，响应码失败: %+v", statusCode)
 	}
 	return body, nil
 }

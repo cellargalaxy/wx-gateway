@@ -12,15 +12,17 @@ import (
 var httpClient *resty.Client
 
 func init() {
-	cxt := context.Background()
-	cxt = util.SetLogId(cxt)
 	httpClient = resty.New().
 		SetTimeout(config.Config.Timeout).
 		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
+	cxt := context.Background()
+	cxt = util.SetLogId(cxt)
 	flushAccessToken(cxt)
 	go func() {
 		for {
 			time.Sleep(30 * time.Minute)
+			cxt := context.Background()
+			cxt = util.SetLogId(cxt)
 			flushAccessToken(cxt)
 		}
 	}()

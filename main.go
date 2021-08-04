@@ -5,8 +5,11 @@ import (
 	"github.com/cellargalaxy/msg-gateway/controller"
 )
 
-func main() {
+func init() {
 	util.InitLog("msg_gateway.log")
+}
+
+func main() {
 	err := controller.Controller()
 	if err != nil {
 		panic(err)
