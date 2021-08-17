@@ -59,7 +59,7 @@ func createHttpClient(timeout, sleep time.Duration, retry int) *resty.Client {
 				logrus.WithFields(logrus.Fields{"attempt": attempt}).Error("HTTP请求异常，超过最大重试次数")
 				return 0, fmt.Errorf("HTTP请求异常，超过最大重试次数")
 			}
-			duration := sleep
+			duration := util.WareDuration(sleep)
 			for i := 0; i < attempt-1; i++ {
 				duration *= 10
 			}

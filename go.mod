@@ -3,7 +3,7 @@ module github.com/cellargalaxy/msg-gateway
 go 1.16
 
 require (
-	github.com/cellargalaxy/go_common v0.0.0-20210731094622-6f6a8fd45a96
+	github.com/cellargalaxy/go_common v0.0.0-20210817120653-2a2e6e9cce99
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-ini/ini v1.62.0

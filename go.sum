@@ -9,6 +9,8 @@ github.com/cellargalaxy/go_common v0.0.0-20210731075552-8b04a1c652b0 h1:bMebGEvG
 github.com/cellargalaxy/go_common v0.0.0-20210731075552-8b04a1c652b0/go.mod h1:Ap7cbiePGRtvK6dgo7Y6mCv3PyMoeWlGNqnvZp5yAF8=
 github.com/cellargalaxy/go_common v0.0.0-20210731094622-6f6a8fd45a96 h1:8UQW3j+nscvsWwMtpqoauZmUaXE+DiiuJSmMLVwFo6E=
 github.com/cellargalaxy/go_common v0.0.0-20210731094622-6f6a8fd45a96/go.mod h1:Ap7cbiePGRtvK6dgo7Y6mCv3PyMoeWlGNqnvZp5yAF8=
+github.com/cellargalaxy/go_common v0.0.0-20210817120653-2a2e6e9cce99 h1:Vun2AfxSX1KNifXiFhuvteAF0pgKGk/ZfQaM0rbH2mA=
+github.com/cellargalaxy/go_common v0.0.0-20210817120653-2a2e6e9cce99/go.mod h1:Ap7cbiePGRtvK6dgo7Y6mCv3PyMoeWlGNqnvZp5yAF8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
