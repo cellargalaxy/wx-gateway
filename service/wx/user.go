@@ -62,7 +62,7 @@ func analysisListAllOpenId(ctx context.Context, jsonString string) ([]string, er
 
 //获取全部openId
 func requestListAllOpenId(ctx context.Context) (string, error) {
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetQueryParam("access_token", GetAccessToken(ctx)).
 		Get("https://api.weixin.qq.com/cgi-bin/user/get")
 
@@ -130,7 +130,7 @@ func requestListUserInfo(ctx context.Context, openIds []string) (string, error) 
 	}
 	logrus.WithContext(ctx).WithFields(logrus.Fields{"userList": userList}).Info("获取用户信息")
 
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetQueryParam("access_token", GetAccessToken(ctx)).
 		SetBody(map[string]interface{}{
@@ -199,7 +199,7 @@ func analysisListOpenIdByTagId(ctx context.Context, jsonString string) ([]string
 
 //获取标签下的openId
 func requestListOpenIdByTagId(ctx context.Context, tagId int) (string, error) {
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetQueryParam("access_token", GetAccessToken(ctx)).
 		SetBody(map[string]interface{}{

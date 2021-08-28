@@ -2,11 +2,14 @@ package main
 
 import (
 	"github.com/cellargalaxy/go_common/util"
+	"github.com/cellargalaxy/msg-gateway/config"
 	"github.com/cellargalaxy/msg-gateway/controller"
+	"github.com/sirupsen/logrus"
 )
 
 func init() {
-	util.InitLog("msg_gateway.log")
+	logrus.SetLevel(config.Config.LogLevel)
+	util.InitLog("msg_gateway")
 }
 
 func main() {

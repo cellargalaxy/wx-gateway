@@ -15,5 +15,5 @@
 # vendor/
 
 .idea
-msg_gateway.log
-test/msg_gateway.log
+msg-gateway
+*.log

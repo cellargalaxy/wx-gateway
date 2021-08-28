@@ -80,7 +80,7 @@ func analysisListAllTemplate(ctx context.Context, jsonString string) ([]model.Te
 
 //获取所有模板
 func requestListAllTemplate(ctx context.Context) (string, error) {
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetQueryParam("access_token", GetAccessToken(ctx)).
 		Get("https://api.weixin.qq.com/cgi-bin/template/get_all_private_template")
 
@@ -141,7 +141,7 @@ func analysisSendTemplate(ctx context.Context, jsonString string) (bool, error) 
 
 //发送模板信息
 func requestSendTemplate(ctx context.Context, openId string, templateId string, url string, data map[string]model.TemplateData) (string, error) {
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetQueryParam("access_token", GetAccessToken(ctx)).
 		SetBody(map[string]interface{}{

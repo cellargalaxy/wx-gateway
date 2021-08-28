@@ -40,30 +40,38 @@ func createHttpClient(timeout, sleep time.Duration, retry int) *resty.Client {
 		SetRetryWaitTime(sleep).
 		SetRetryMaxWaitTime(5 * time.Minute).
 		AddRetryCondition(func(response *resty.Response, err error) bool {
+			ctx := util.CreateLogCtx()
+			if response != nil && response.Request != nil {
+				ctx = response.Request.Context()
+			}
 			var statusCode int
 			if response != nil {
 				statusCode = response.StatusCode()
 			}
 			retry := statusCode != http.StatusOK || err != nil
 			if retry {
-				logrus.WithFields(logrus.Fields{"statusCode": statusCode, "err": err}).Warn("HTTP请求异常，进行重试")
+				logrus.WithContext(ctx).WithFields(logrus.Fields{"statusCode": statusCode, "err": err}).Warn("HTTP请求异常，进行重试")
 			}
 			return retry
 		}).
-		SetRetryAfter(func(client *resty.Client, resp *resty.Response) (time.Duration, error) {
+		SetRetryAfter(func(client *resty.Client, response *resty.Response) (time.Duration, error) {
+			ctx := util.CreateLogCtx()
+			if response != nil && response.Request != nil {
+				ctx = response.Request.Context()
+			}
 			var attempt int
-			if resp != nil && resp.Request != nil {
-				attempt = resp.Request.Attempt
+			if response != nil && response.Request != nil {
+				attempt = response.Request.Attempt
 			}
 			if attempt > retry {
-				logrus.WithFields(logrus.Fields{"attempt": attempt}).Error("HTTP请求异常，超过最大重试次数")
+				logrus.WithContext(ctx).WithFields(logrus.Fields{"attempt": attempt}).Error("HTTP请求异常，超过最大重试次数")
 				return 0, fmt.Errorf("HTTP请求异常，超过最大重试次数")
 			}
 			duration := sleep
 			for i := 0; i < attempt-1; i++ {
 				duration *= 10
 			}
-			logrus.WithFields(logrus.Fields{"attempt": attempt, "duration": duration}).Warn("HTTP请求异常，休眠重试")
+			logrus.WithContext(ctx).WithFields(logrus.Fields{"attempt": attempt, "duration": duration}).Warn("HTTP请求异常，休眠重试")
 			return duration, nil
 		}).
 		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
@@ -113,7 +121,7 @@ func (this MsgClient) requestSendTgMsg2ConfigChatId(ctx context.Context, text st
 	if err != nil {
 		return "", err
 	}
-	response, err := this.httpClient.R().
+	response, err := this.httpClient.R().SetContext(ctx).
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetHeader("Authorization", "Bearer "+jwtToken).
 		SetHeader(util.LogIdKey, fmt.Sprint(util.GetLogId(ctx))).
@@ -183,7 +191,7 @@ func (this MsgClient) requestSendWxTemplateToTag(ctx context.Context, templateId
 	if err != nil {
 		return "", err
 	}
-	response, err := this.httpClient.R().
+	response, err := this.httpClient.R().SetContext(ctx).
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetHeader("Authorization", "Bearer "+jwtToken).
 		SetHeader(util.LogIdKey, fmt.Sprint(util.GetLogId(ctx))).
@@ -241,7 +249,7 @@ func (this MsgClient) requestSendTemplateToCommonTag(ctx context.Context, text s
 	if err != nil {
 		return "", err
 	}
-	response, err := this.httpClient.R().
+	response, err := this.httpClient.R().SetContext(ctx).
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetHeader("Authorization", "Bearer "+jwtToken).
 		SetHeader(util.LogIdKey, fmt.Sprint(util.GetLogId(ctx))).

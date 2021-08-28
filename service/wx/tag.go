@@ -49,7 +49,7 @@ func analysisDeleteTagFromUser(ctx context.Context, jsonString string) (bool, er
 
 //为用户删标签
 func requestDeleteTagFromUser(ctx context.Context, tagId int, openIds []string) (string, error) {
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetQueryParam("access_token", GetAccessToken(ctx)).
 		SetBody(map[string]interface{}{
@@ -115,7 +115,7 @@ func analysisAddTagToUser(ctx context.Context, jsonString string) (bool, error) 
 
 //给用户加标签
 func requestAddTagToUser(ctx context.Context, tagId int, openIds []string) (string, error) {
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetQueryParam("access_token", GetAccessToken(ctx)).
 		SetBody(map[string]interface{}{
@@ -181,7 +181,7 @@ func analysisDeleteTag(ctx context.Context, jsonString string) (bool, error) {
 
 //删除标签
 func requestDeleteTag(ctx context.Context, tagId int) (string, error) {
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetQueryParam("access_token", GetAccessToken(ctx)).
 		SetBody(map[string]interface{}{
@@ -247,7 +247,7 @@ func analysisListAllTag(ctx context.Context, jsonString string) ([]model.Tag, er
 
 //获取所有标签
 func requestListAllTag(ctx context.Context) (string, error) {
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetQueryParam("access_token", GetAccessToken(ctx)).
 		Get("https://api.weixin.qq.com/cgi-bin/tags/get")
 
@@ -308,7 +308,7 @@ func analysisCreateTag(ctx context.Context, jsonString string) (bool, error) {
 
 //创建标签
 func requestCreateTag(ctx context.Context, tag string) (string, error) {
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetQueryParam("access_token", GetAccessToken(ctx)).
 		SetBody(map[string]interface{}{

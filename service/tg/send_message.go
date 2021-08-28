@@ -48,7 +48,7 @@ func analysisSendMsg(ctx context.Context, jsonString string) (bool, error) {
 
 //发送tg信息
 func requestSendMsg(ctx context.Context, chatId int64, text string) (string, error) {
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetHeader("Content-Type", "application/json;CHARSET=utf-8").
 		SetQueryParam("parse_mode", "MarkdownV2").
 		SetQueryParam("chat_id", fmt.Sprint(chatId)).

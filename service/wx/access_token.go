@@ -58,7 +58,7 @@ func analysisAccessToken(ctx context.Context, jsonString string) (string, error)
 
 //获取accessToken
 func requestAccessToken(ctx context.Context) (string, error) {
-	response, err := httpClient.R().
+	response, err := httpClient.R().SetContext(ctx).
 		SetQueryParam("appid", config.Config.WxAppId).
 		SetQueryParam("secret", config.Config.WxAppSecret).
 		SetQueryParam("grant_type", "client_credential").
